@@ -1,0 +1,51 @@
+version: '3.2'
+services:
+  web:
+    build: .
+    volumes:
+      - ./:/var/www
+      - ./logs/:/var/log
+    ports:
+      - "8082:80"
+    environment:
+      - "DB_DATABASE=laravel"
+      - "DB_PORT=3306"
+      - "DB_HOST=mysql"
+      - "DB_USERNAME=root"
+      - "DB_PASSWORD=secret"
+      - "APP_NAME=Test"
+      - "APP_ENV=local"
+      - "APP_KEY=base64:Yk21kHYutfrGGcafpuUNaXjbLKLmtPHTjABFZGt8N2o="
+      - "APP_DEBUG=true"
+      - "APP_URL=http://localhost:8082"
+      - "LOG_CHANNEL=stack"
+      - "TMDB_ENDPOINT=https://api.themoviedb.org/3/"
+      - "TMDB_APP_KEY=3ea6136b1dc55fe655b47ca6dd3c03f1"
+    links:
+      - mysql
+  mysql:
+    image: mysql:5.7
+    command: --ft_min_word_len=2 --innodb_ft_min_token_size=2 --innodb_ft_enable_stopword=0;
+    environment:
+      - "MYSQL_ROOT_PASSWORD=secret"
+      - "MYSQL_DATABASE=laravel"
+    ports:
+      - "33060:3306"
+    volumes:
+      - my-datavolume:/var/lib/mysql
+  pma:
+     image: phpmyadmin/phpmyadmin
+     environment:
+       - "MYSQL_ROOT_PASSWORD=secret"
+       - "MYSQL_DATABASE=laravel"
+       - "PMA_HOST=mysql"
+       - "PMA_USER=root"
+       - "PMA_PASSWORD=secret"
+     ports:
+       - "9092:80"
+     volumes:
+       - my-datavolume:/var/lib/mysql
+     links:
+       - mysql
+volumes:
+  my-datavolume:
